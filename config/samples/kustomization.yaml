@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- myelin_v1alpha1_myelinsecret.yaml
+- myelin_v1alpha1_myelinsecretpolicy.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples
