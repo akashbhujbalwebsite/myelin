@@ -66,6 +66,9 @@ func (r *MyelinSecretPolicyReconciler) Reconcile(ctx context.Context, req ctrl.R
 		if err := r.Update(ctx, policy); err != nil {
 			return ctrl.Result{}, err
 		}
+		// Return here — the Update bumps resourceVersion; continuing with a stale
+		// object causes a 409 on Status().Update(). The object change auto-requeues.
+		return ctrl.Result{}, nil
 	}
 
 	// Verify the referenced MyelinSecret exists.

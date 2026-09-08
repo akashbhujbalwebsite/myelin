@@ -70,6 +70,9 @@ func (r *MyelinSecretReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		if err := r.Update(ctx, ms); err != nil {
 			return ctrl.Result{}, err
 		}
+		// Return here — the Update bumps resourceVersion; continuing with a stale
+		// object causes a 409 on Status().Update(). The object change auto-requeues.
+		return ctrl.Result{}, nil
 	}
 
 	// Decrypt all keys.
@@ -95,6 +98,7 @@ func (r *MyelinSecretReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			return ctrl.Result{}, err
 		}
 		if err := r.Create(ctx, secret); err != nil {
+			log.Error(err, "failed to create Secret", "secret", ms.Name)
 			return ctrl.Result{}, r.setConditionReady(ctx, ms, metav1.ConditionFalse,
 				myelinv1alpha1.ReasonSecretSyncFailed, err.Error())
 		}

@@ -28,10 +28,8 @@ import (
 	"github.com/myelinio/myelin/internal/crypto"
 )
 
-// testPrivKey is used to encrypt test fixture data.
-// The suite manager uses its own generated key; these tests verify status
-// transitions and resource creation, not decrypt correctness (crypto_test covers that).
-var testPrivKey, _ = crypto.GenerateKeyPair()
+// customSecretType has no apiserver-enforced required keys (unlike DockerConfigJson/BasicAuth).
+const customSecretType corev1.SecretType = "myelin.io/test"
 
 var _ = Describe("MyelinSecret controller", func() {
 	const namespace = "default"
@@ -41,7 +39,7 @@ var _ = Describe("MyelinSecret controller", func() {
 			name := "test-ms-basic"
 			label := crypto.Label(name, namespace)
 
-			enc, err := crypto.Encrypt(&testPrivKey.PublicKey, []byte("my-password"), label)
+			enc, err := crypto.Encrypt(&suiteKey.PublicKey, []byte("my-password"), label)
 			Expect(err).NotTo(HaveOccurred())
 
 			ms := &myelinv1alpha1.MyelinSecret{
@@ -74,7 +72,7 @@ var _ = Describe("MyelinSecret controller", func() {
 			name := "test-ms-type"
 			label := crypto.Label(name, namespace)
 
-			enc, err := crypto.Encrypt(&testPrivKey.PublicKey, []byte("val"), label)
+			enc, err := crypto.Encrypt(&suiteKey.PublicKey, []byte("val"), label)
 			Expect(err).NotTo(HaveOccurred())
 
 			ms := &myelinv1alpha1.MyelinSecret{
@@ -82,7 +80,7 @@ var _ = Describe("MyelinSecret controller", func() {
 				Spec: myelinv1alpha1.MyelinSecretSpec{
 					EncryptedData: map[string]string{"key": enc},
 					Template: myelinv1alpha1.SecretTemplateSpec{
-						Type: corev1.SecretTypeDockerConfigJson,
+						Type: customSecretType,
 					},
 				},
 			}
@@ -93,6 +91,11 @@ var _ = Describe("MyelinSecret controller", func() {
 				_ = k8sClient.Get(ctx, types.NamespacedName{Name: name, Namespace: namespace}, u)
 				return u.Status.SecretName
 			}, "30s", "1s").Should(Equal(name))
+
+			By("verifying the Secret has the correct type")
+			s := &corev1.Secret{}
+			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: name, Namespace: namespace}, s)).To(Succeed())
+			Expect(s.Type).To(Equal(customSecretType))
 
 			DeferCleanup(func() { _ = k8sClient.Delete(ctx, ms) })
 		})
@@ -133,7 +136,7 @@ var _ = Describe("MyelinSecretPolicy controller", func() {
 		It("should set RBACReady=True and populate role/rolebinding names in status", func() {
 			msName := "test-policy-ms"
 			label := crypto.Label(msName, namespace)
-			enc, err := crypto.Encrypt(&testPrivKey.PublicKey, []byte("val"), label)
+			enc, err := crypto.Encrypt(&suiteKey.PublicKey, []byte("val"), label)
 			Expect(err).NotTo(HaveOccurred())
 
 			ms := &myelinv1alpha1.MyelinSecret{

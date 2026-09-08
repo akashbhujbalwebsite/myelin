@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"crypto/rsa"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,11 +40,13 @@ import (
 )
 
 var (
-	ctx       context.Context
-	cancel    context.CancelFunc
-	testEnv   *envtest.Environment
-	cfg       *rest.Config
-	k8sClient client.Client
+	ctx        context.Context
+	cancel     context.CancelFunc
+	testEnv    *envtest.Environment
+	cfg        *rest.Config
+	k8sClient  client.Client
+	// suiteKey is the key the controller manager uses; tests must encrypt with suiteKey.PublicKey.
+	suiteKey *rsa.PrivateKey
 )
 
 func TestControllers(t *testing.T) {
@@ -74,7 +77,8 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	// Start the controller manager with a real key pair.
-	priv, err := crypto.GenerateKeyPair()
+	// suiteKey is package-level so tests can encrypt with suiteKey.PublicKey.
+	suiteKey, err = crypto.GenerateKeyPair()
 	Expect(err).NotTo(HaveOccurred())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{Scheme: scheme.Scheme})
@@ -83,7 +87,7 @@ var _ = BeforeSuite(func() {
 	Expect((&MyelinSecretReconciler{
 		Client:     mgr.GetClient(),
 		Scheme:     mgr.GetScheme(),
-		PrivateKey: priv,
+		PrivateKey: suiteKey,
 	}).SetupWithManager(mgr)).To(Succeed())
 
 	Expect((&MyelinSecretPolicyReconciler{
