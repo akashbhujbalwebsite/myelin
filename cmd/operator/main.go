@@ -28,6 +28,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -94,9 +95,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Use a direct (non-cached) client for keystore bootstrap.
+	// mgr.GetClient() requires the cache to be running, but we need the key
+	// before mgr.Start() is called. A direct client talks straight to the API server.
+	directClient, err := client.New(mgr.GetConfig(), client.Options{Scheme: mgr.GetScheme()})
+	if err != nil {
+		setupLog.Error(err, "unable to create direct client for keystore")
+		os.Exit(1)
+	}
+
 	// Load or generate the operator RSA key pair.
 	// The key is persisted in a Kubernetes Secret so it survives pod restarts.
-	ks := keystore.New(mgr.GetClient(), keySecretName, keySecretNamespace)
+	ks := keystore.New(directClient, keySecretName, keySecretNamespace)
 	privateKey, err := ks.LoadOrGenerate(ctrl.SetupSignalHandler(), crypto.GenerateKeyPair)
 	if err != nil {
 		setupLog.Error(err, "unable to load or generate operator key pair")
