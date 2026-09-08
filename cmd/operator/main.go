@@ -61,8 +61,10 @@ func main() {
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "Address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false, "Enable HTTP/2 for metrics and webhook servers.")
-	flag.StringVar(&keySecretName, "key-secret-name", "myelin-operator-key", "Name of the Secret holding the operator RSA key pair.")
-	flag.StringVar(&keySecretNamespace, "key-secret-namespace", "myelin-system", "Namespace of the operator RSA key Secret.")
+	flag.StringVar(&keySecretName, "key-secret-name", "myelin-operator-key",
+		"Name of the Secret holding the operator RSA key pair.")
+	flag.StringVar(&keySecretNamespace, "key-secret-namespace", "myelin-system",
+		"Namespace of the operator RSA key Secret.")
 
 	opts := zap.Options{Development: false}
 	opts.BindFlags(flag.CommandLine)
