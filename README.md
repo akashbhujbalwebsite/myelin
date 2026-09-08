@@ -29,8 +29,11 @@ Myelin Operator
 
 ## Quick start
 
+> **Note:** No tagged release exists yet — `install.yaml` is generated on tag push via CI.
+> Until then, install from source using `kubectl apply -k config/default` after cloning.
+
 ```bash
-# 1. Install the operator
+# 1. Install the operator (once a release is tagged)
 kubectl apply -f https://github.com/akashbhujbalwebsite/myelin/releases/latest/download/install.yaml
 
 # 2. Save the operator public key locally
