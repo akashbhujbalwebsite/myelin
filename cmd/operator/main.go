@@ -104,10 +104,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	// SetupSignalHandler must only be called once per process.
+	ctx := ctrl.SetupSignalHandler()
+
 	// Load or generate the operator RSA key pair.
 	// The key is persisted in a Kubernetes Secret so it survives pod restarts.
 	ks := keystore.New(directClient, keySecretName, keySecretNamespace)
-	privateKey, err := ks.LoadOrGenerate(ctrl.SetupSignalHandler(), crypto.GenerateKeyPair)
+	privateKey, err := ks.LoadOrGenerate(ctx, crypto.GenerateKeyPair)
 	if err != nil {
 		setupLog.Error(err, "unable to load or generate operator key pair")
 		os.Exit(1)
@@ -141,7 +144,7 @@ func main() {
 	}
 
 	setupLog.Info("starting myelin operator")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
