@@ -2,7 +2,7 @@
 
 > Declarative secret access intent, automatically enforced as Kubernetes RBAC.
 
-[![CI](https://github.com/myelinio/myelin/actions/workflows/ci.yaml/badge.svg)](https://github.com/myelinio/myelin/actions)
+[![CI](https://github.com/akashbhujbalwebsite/myelin/actions/workflows/ci.yaml/badge.svg)](https://github.com/akashbhujbalwebsite/myelin/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 ## What problem does Myelin solve?
@@ -31,7 +31,7 @@ Myelin Operator
 
 ```bash
 # 1. Install the operator
-kubectl apply -f https://github.com/myelinio/myelin/releases/latest/download/install.yaml
+kubectl apply -f https://github.com/akashbhujbalwebsite/myelin/releases/latest/download/install.yaml
 
 # 2. Save the operator public key locally
 myelin pubkey > myelin-pub.pem

@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
-	"github.com/myelinio/myelin/internal/crypto"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
 )
 
 const myelinSecretFinalizer = "myelin.io/secret-finalizer"

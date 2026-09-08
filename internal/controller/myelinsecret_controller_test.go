@@ -24,8 +24,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
-	"github.com/myelinio/myelin/internal/crypto"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
 )
 
 // customSecretType has no apiserver-enforced required keys (unlike DockerConfigJson/BasicAuth).
@@ -110,8 +110,8 @@ var _ = Describe("MyelinSecretPolicy controller", func() {
 			policy := &myelinv1alpha1.MyelinSecretPolicy{
 				ObjectMeta: metav1.ObjectMeta{Name: "test-policy-missing-secret", Namespace: namespace},
 				Spec: myelinv1alpha1.MyelinSecretPolicySpec{
-					SecretRef: myelinv1alpha1.SecretRef{Name: "does-not-exist"},
-					Subjects:  []myelinv1alpha1.PolicySubject{{Kind: "ServiceAccount", Name: "sa"}},
+					SecretRef:   myelinv1alpha1.SecretRef{Name: "does-not-exist"},
+					Subjects:    []myelinv1alpha1.PolicySubject{{Kind: "ServiceAccount", Name: "sa"}},
 					Permissions: myelinv1alpha1.PolicyPermissions{Verbs: []string{"get"}},
 				},
 			}
@@ -148,8 +148,8 @@ var _ = Describe("MyelinSecretPolicy controller", func() {
 			policy := &myelinv1alpha1.MyelinSecretPolicy{
 				ObjectMeta: metav1.ObjectMeta{Name: "test-policy-good", Namespace: namespace},
 				Spec: myelinv1alpha1.MyelinSecretPolicySpec{
-					SecretRef: myelinv1alpha1.SecretRef{Name: msName},
-					Subjects:  []myelinv1alpha1.PolicySubject{{Kind: "ServiceAccount", Name: "api-sa", Namespace: namespace}},
+					SecretRef:   myelinv1alpha1.SecretRef{Name: msName},
+					Subjects:    []myelinv1alpha1.PolicySubject{{Kind: "ServiceAccount", Name: "api-sa", Namespace: namespace}},
 					Permissions: myelinv1alpha1.PolicyPermissions{Verbs: []string{"get"}},
 				},
 			}

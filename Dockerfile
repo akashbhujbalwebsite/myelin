@@ -15,7 +15,7 @@ COPY internal/ internal/
 
 RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} \
     go build -a \
-    -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=${VERSION}" \
+    -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=${VERSION}" \
     -o myelin-operator ./cmd/operator
 
 # Final image — distroless for minimal attack surface (CNCF standard)

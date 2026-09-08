@@ -1,4 +1,4 @@
-module github.com/myelinio/myelin
+module github.com/akashbhujbalwebsite/myelin
 
 go 1.23.0
 

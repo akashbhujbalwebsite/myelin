@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/myelinio/myelin/internal/cli"
+	"github.com/akashbhujbalwebsite/myelin/internal/cli"
 )
 
 func main() {

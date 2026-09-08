@@ -1,6 +1,6 @@
 # Image URL to use all building/pushing image targets
-OPERATOR_IMG ?= ghcr.io/myelinio/myelin-operator:latest
-CLI_IMG     ?= ghcr.io/myelinio/myelin:latest
+OPERATOR_IMG ?= ghcr.io/akashbhujbalwebsite/myelin-operator:latest
+CLI_IMG     ?= ghcr.io/akashbhujbalwebsite/myelin:latest
 IMG         ?= $(OPERATOR_IMG)
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
@@ -95,14 +95,14 @@ lint-config: golangci-lint ## Verify golangci-lint linter configuration
 
 .PHONY: build
 build: manifests generate fmt vet ## Build operator and myelin CLI binaries.
-	go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+	go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
 		-o bin/myelin-operator ./cmd/operator
-	go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+	go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
 		-o bin/myelin ./cmd/myelin
 
 .PHONY: build-cli
 build-cli: ## Build only the myelin CLI.
-	go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+	go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev)" \
 		-o bin/myelin ./cmd/myelin
 
 .PHONY: run

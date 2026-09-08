@@ -91,16 +91,16 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/myelinio/myelin-operator:${{ github.ref_name }},ghcr.io/myelinio/myelin-operator:latest
+          tags: ghcr.io/akashbhujbalwebsite/myelin-operator:${{ github.ref_name }},ghcr.io/akashbhujbalwebsite/myelin-operator:latest
           build-args: VERSION=${{ github.ref_name }}
 
       - name: Build CLI binaries
         run: |
           VERSION=${{ github.ref_name }}
-          GOOS=linux  GOARCH=amd64 go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-linux-amd64   ./cmd/myelin
-          GOOS=linux  GOARCH=arm64 go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-linux-arm64   ./cmd/myelin
-          GOOS=darwin GOARCH=amd64 go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-darwin-amd64  ./cmd/myelin
-          GOOS=darwin GOARCH=arm64 go build -ldflags="-X github.com/myelinio/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-darwin-arm64  ./cmd/myelin
+          GOOS=linux  GOARCH=amd64 go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-linux-amd64   ./cmd/myelin
+          GOOS=linux  GOARCH=arm64 go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-linux-arm64   ./cmd/myelin
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-darwin-amd64  ./cmd/myelin
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-X github.com/akashbhujbalwebsite/myelin/internal/cli.Version=${VERSION}" -o dist/myelin-darwin-arm64  ./cmd/myelin
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

@@ -32,10 +32,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
-	"github.com/myelinio/myelin/internal/controller"
-	"github.com/myelinio/myelin/internal/crypto"
-	"github.com/myelinio/myelin/internal/keystore"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
+	"github.com/akashbhujbalwebsite/myelin/internal/controller"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
+	"github.com/akashbhujbalwebsite/myelin/internal/keystore"
 )
 
 var (

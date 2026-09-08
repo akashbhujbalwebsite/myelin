@@ -65,7 +65,7 @@ spec:
           - --health-probe-bind-address=:8081
           - --key-secret-name=myelin-operator-key
           - --key-secret-namespace=myelin-system
-        image: ghcr.io/myelinio/myelin-operator:latest
+        image: ghcr.io/akashbhujbalwebsite/myelin-operator:latest
         name: manager
         ports: []
         securityContext:

@@ -35,16 +35,16 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
-	"github.com/myelinio/myelin/internal/crypto"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
 )
 
 var (
-	ctx        context.Context
-	cancel     context.CancelFunc
-	testEnv    *envtest.Environment
-	cfg        *rest.Config
-	k8sClient  client.Client
+	ctx       context.Context
+	cancel    context.CancelFunc
+	testEnv   *envtest.Environment
+	cfg       *rest.Config
+	k8sClient client.Client
 	// suiteKey is the key the controller manager uses; tests must encrypt with suiteKey.PublicKey.
 	suiteKey *rsa.PrivateKey
 )

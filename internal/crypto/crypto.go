@@ -18,17 +18,17 @@ limitations under the License.
 //
 // Encryption scheme (per secret key-value):
 //
-//	1. Generate a fresh 256-bit AES key (crypto/rand).
-//	2. Encrypt the plaintext with AES-256-GCM.
-//	   - A fresh 96-bit nonce is generated per encryption.
-//	   - The OAEP label (namespace/name) is used as GCM additional data (AAD),
-//	     binding the ciphertext to the specific secret identity.
-//	   - GCM provides authenticated encryption — tampering is detected, not hidden.
-//	3. Encrypt the AES key with RSA-4096-OAEP (SHA-256), using the same label.
-//	4. The wire format is: base64( len(encryptedKey)[4 bytes big-endian]
-//	                                || encryptedKey
-//	                                || nonce[12 bytes]
-//	                                || aesCiphertext )
+//  1. Generate a fresh 256-bit AES key (crypto/rand).
+//  2. Encrypt the plaintext with AES-256-GCM.
+//     - A fresh 96-bit nonce is generated per encryption.
+//     - The OAEP label (namespace/name) is used as GCM additional data (AAD),
+//     binding the ciphertext to the specific secret identity.
+//     - GCM provides authenticated encryption — tampering is detected, not hidden.
+//  3. Encrypt the AES key with RSA-4096-OAEP (SHA-256), using the same label.
+//  4. The wire format is: base64( len(encryptedKey)[4 bytes big-endian]
+//     || encryptedKey
+//     || nonce[12 bytes]
+//     || aesCiphertext )
 //
 // This approach has no plaintext size limit (unlike raw RSA which caps at 446 bytes
 // for RSA-4096-OAEP-SHA256) and provides IND-CCA2 security for the key wrapping
@@ -53,7 +53,7 @@ const (
 	// RSAKeyBits is the key size for the operator RSA key pair.
 	RSAKeyBits = 4096
 
-	aesKeyLen  = 32 // AES-256
+	aesKeyLen   = 32 // AES-256
 	gcmNonceLen = 12 // standard GCM nonce size
 )
 

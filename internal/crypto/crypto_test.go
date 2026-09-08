@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/myelinio/myelin/internal/crypto"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
 )
 
 // sharedKey is generated once for the test binary — key generation is slow (RSA-4096).
@@ -131,8 +131,8 @@ func TestTamperedCiphertext(t *testing.T) {
 func TestMalformedCiphertext(t *testing.T) {
 	label := crypto.Label("test", "default")
 	cases := []string{
-		"",                          // empty
-		"not-base64!!!",             // invalid base64
+		"",              // empty
+		"not-base64!!!", // invalid base64
 		base64.StdEncoding.EncodeToString([]byte("short")), // too short
 	}
 	for _, c := range cases {

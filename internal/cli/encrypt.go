@@ -27,20 +27,20 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
-	"github.com/myelinio/myelin/internal/crypto"
-	"github.com/myelinio/myelin/internal/kubeclient"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
+	"github.com/akashbhujbalwebsite/myelin/internal/crypto"
+	"github.com/akashbhujbalwebsite/myelin/internal/kubeclient"
 )
 
 func newEncryptCmd() *cobra.Command {
 	var (
-		name             string
-		namespace        string
-		literals         []string
-		fromFile         string
-		keySecretName    string
-		keySecretNS      string
-		pubKeyFile       string
+		name          string
+		namespace     string
+		literals      []string
+		fromFile      string
+		keySecretName string
+		keySecretNS   string
+		pubKeyFile    string
 	)
 
 	cmd := &cobra.Command{

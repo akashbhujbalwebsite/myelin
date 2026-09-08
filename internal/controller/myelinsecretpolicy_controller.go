@@ -30,7 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
-	myelinv1alpha1 "github.com/myelinio/myelin/api/v1alpha1"
+	myelinv1alpha1 "github.com/akashbhujbalwebsite/myelin/api/v1alpha1"
 )
 
 const policyFinalizer = "myelin.io/policy-finalizer"

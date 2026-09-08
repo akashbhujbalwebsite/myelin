@@ -22,7 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/myelinio/myelin/internal/kubeclient"
+	"github.com/akashbhujbalwebsite/myelin/internal/kubeclient"
 )
 
 func newPubkeyCmd() *cobra.Command {
