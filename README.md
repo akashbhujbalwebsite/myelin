@@ -27,21 +27,36 @@ Myelin Operator
 
 ## Quick start
 
-```bash
-# 1. Install the operator
-kubectl apply -f https://github.com/akashbhujbalwebsite/myelin/releases/latest/download/install.yaml
+### Install the CLI
 
-# 2. Save the operator public key locally
+Download the latest `myelin` binary from the [Releases page](https://github.com/akashbhujbalwebsite/myelin/releases/latest) and place it on your `$PATH`, or build from source:
+
+```bash
+git clone https://github.com/akashbhujbalwebsite/myelin.git
+cd myelin
+go install ./cmd/myelin
+```
+
+### Install the operator
+
+```bash
+kubectl apply -f https://github.com/akashbhujbalwebsite/myelin/releases/latest/download/install.yaml
+```
+
+### Encrypt and apply a secret
+
+```bash
+# Save the operator public key locally (no cluster writes needed after this)
 myelin pubkey > myelin-pub.pem
 
-# 3. Encrypt a secret
+# Encrypt — plaintext never leaves your machine
 myelin encrypt \
   --name db-creds \
   --namespace prod \
   --from-literal password=supersecret \
   --public-key-file ./myelin-pub.pem | kubectl apply -f -
 
-# 4. Declare access policy
+# Declare access policy
 kubectl apply -f - <<EOF
 apiVersion: myelin.myelin.io/v1alpha1
 kind: MyelinSecretPolicy
@@ -59,7 +74,7 @@ spec:
     verbs: ["get"]
 EOF
 
-# 5. Verify
+# Verify scoping
 kubectl auth can-i get secret/db-creds \
   --as=system:serviceaccount:prod:api-server -n prod
 # yes
@@ -82,20 +97,23 @@ The encrypted blob is base64-encoded and stored in `spec.encryptedData`. The ope
 
 ## Prior art & comparison
 
-Several tools address adjacent problems — Myelin's specific combination of properties is not available elsewhere:
+Several tools address overlapping or adjacent problems. Myelin focuses on a specific combination of these capabilities:
 
-| Feature | Sealed Secrets | ESO | KubeVault | access-manager | **Myelin** |
+| Capability | Sealed Secrets | ESO | KubeVault SAR | access-manager | **Myelin** |
 |---|---|---|---|---|---|
-| Encrypt secrets for Git | ✅ | ❌ | ❌ | ❌ | ✅ |
-| No external secrets store required | ✅ | ❌ (needs AWS/GCP/Vault) | ❌ (needs Vault) | ✅ | ✅ |
-| Per-secret RBAC (resourceNames) | ❌ | ❌ | ✅ (via SecretAccessRequest) | ✅ | ✅ |
-| Continuous RBAC drift correction | ❌ | ❌ | ❌ | ❌ | ✅ |
-| No approval workflow | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Ciphertext safe to Git-commit | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Git-safe client-side encryption | ✅ | ❌ | ❌ | ❌ | ✅ |
+| No Vault dependency | ✅ | ⚠️ | ❌ * | ✅ | ✅ |
+| Declarative per-secret RBAC | ❌ | ❌ | ✅ | ⚠️ | ✅ |
+| Continuous reconciliation of generated per-secret RBAC | ❌ | ❌ | ⚠️ | ⚠️ | ✅ |
+| No approval workflow required | ✅ | ✅ | ❌ | ✅ | ✅ |
 
-**Myelin's proposed differentiation:** the combination of Git-safe ciphertext + no Vault dependency + per-secret RBAC + continuous drift correction. No tool in the table above provides all four together, but this is a fast-moving ecosystem — check each project's current roadmap.
+\* KubeVault's `SecretAccessRequest` flow uses Vault-backed secret engines.
 
-KubeVault provides per-secret RBAC via `SecretAccessRequest` but requires a running Vault cluster. Sealed Secrets handles Git-safe encryption but has no RBAC automation. ESO syncs from external stores but neither encrypts for Git nor manages RBAC. access-manager handles RBAC but has no encryption.
+ESO primarily synchronizes secrets from external providers; it also supports Kubernetes as a provider but does not generate per-secret RBAC.
+
+access-manager reconciles RBAC definitions cluster-wide but is not scoped to individual secrets via `resourceNames`. **Note: access-manager was archived on December 8, 2025 and is no longer maintained.**
+
+**Myelin's proposed differentiation** is the combination of Git-safe client-side encryption, no Vault dependency, declarative per-secret RBAC, and continuous reconciliation of the RBAC generated from that policy. No tool in the comparison above provides this exact combination based on the documented capabilities reviewed. This is a fast-moving ecosystem, so the comparison should be revalidated as projects evolve.
 
 ## Threat model
 
@@ -113,7 +131,7 @@ KubeVault provides per-secret RBAC via `SecretAccessRequest` but requires a runn
 
 - **Plaintext briefly in memory**: decrypted values exist in the controller's memory during reconciliation, and on the CLI before encryption. This is unavoidable and intentionally documented.
 - **Cluster-admin access**: a user with `cluster-admin` or direct `secrets:get` on the namespace can read the generated Secret regardless of Myelin policy.
-- **Workload-level enforcement**: Myelin controls Kubernetes API access to the Secret. It does not prevent a pod that already has the secret mounted from reading it after policy is changed. Workload-level enforcement requires admission webhooks (planned for V1.1).
+- **Workload-level enforcement**: Myelin controls Kubernetes API access to the Secret. It does not prevent a pod that already has the secret mounted from reading it after policy is changed. Workload-level enforcement is outside V1 scope; admission policy and webhooks are a possible future direction.
 - **Key store compromise**: if the `myelin-operator-key` Secret in `myelin-system` is compromised, all encrypted secrets can be decrypted. Protect this secret accordingly.
 
 ## Key rotation
@@ -123,7 +141,7 @@ Myelin uses a single operator key pair stored in the `myelin-operator-key` Secre
 **Rotating the key:**
 1. Generate a new key pair and update `myelin-operator-key`.
 2. Re-encrypt all `MyelinSecret` objects: `myelin encrypt ... | kubectl apply -f -` for each.
-3. The operator picks up the new key on restart and reconciles.
+3. After the operator is restarted with the new key, it reconciles using the new key.
 
 Old `MyelinSecret` objects encrypted with the previous key will set `Ready=False` (reason: `DecryptFailed`) until re-encrypted. Multi-key rotation support is planned for V2.
 
