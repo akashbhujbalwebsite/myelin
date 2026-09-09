@@ -9,9 +9,7 @@
 
 After a secret lands in Kubernetes, someone still has to manually write a `Role` and `RoleBinding` to control who can read it. This is tedious, error-prone, and drifts over time.
 
-No existing tool (Sealed Secrets, ESO, Vault) automates this step.
-
-**Myelin fills that gap:** declare who should have access to a secret in a single CRD, and the operator continuously reconciles that intent into Kubernetes RBAC.
+**Myelin fills that gap:** declare who should have access to a secret in a single CRD, and the operator continuously reconciles that intent into Kubernetes RBAC — no Vault required, ciphertext is safe to Git-commit, no approval workflow.
 
 ## How it works
 
@@ -48,7 +46,7 @@ myelin encrypt \
 
 # 4. Declare access policy
 kubectl apply -f - <<EOF
-apiVersion: myelin.io/v1alpha1
+apiVersion: myelin.myelin.io/v1alpha1
 kind: MyelinSecretPolicy
 metadata:
   name: db-creds-policy
@@ -85,6 +83,23 @@ Myelin uses **hybrid envelope encryption** — there is no plaintext size limit:
 
 The encrypted blob is base64-encoded and stored in `spec.encryptedData`. The operator's private key never leaves the cluster.
 
+## Prior art & comparison
+
+Several tools address adjacent problems — Myelin's specific combination of properties is not available elsewhere:
+
+| Feature | Sealed Secrets | ESO | KubeVault | access-manager | **Myelin** |
+|---|---|---|---|---|---|
+| Encrypt secrets for Git | ✅ | ❌ | ❌ | ❌ | ✅ |
+| No external secrets store required | ✅ | ❌ (needs AWS/GCP/Vault) | ❌ (needs Vault) | ✅ | ✅ |
+| Per-secret RBAC (resourceNames) | ❌ | ❌ | ✅ (via SecretAccessRequest) | ✅ | ✅ |
+| Continuous RBAC drift correction | ❌ | ❌ | ❌ | ❌ | ✅ |
+| No approval workflow | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Ciphertext safe to Git-commit | ✅ | ❌ | ❌ | ❌ | ✅ |
+
+**Myelin's precise differentiator:** the combination of Git-safe ciphertext + no Vault dependency + per-secret RBAC + continuous drift correction — none of the above tools provide all four together.
+
+KubeVault provides per-secret RBAC via `SecretAccessRequest` but requires a running Vault cluster. Sealed Secrets handles Git-safe encryption but has no RBAC automation. ESO syncs from external stores but neither encrypts for Git nor manages RBAC. access-manager handles RBAC but has no encryption.
+
 ## Threat model
 
 ### What Myelin protects against
@@ -120,7 +135,7 @@ Old `MyelinSecret` objects encrypted with the previous key will set `Ready=False
 ### MyelinSecret
 
 ```yaml
-apiVersion: myelin.io/v1alpha1
+apiVersion: myelin.myelin.io/v1alpha1
 kind: MyelinSecret
 metadata:
   name: db-creds
@@ -135,7 +150,7 @@ spec:
 ### MyelinSecretPolicy
 
 ```yaml
-apiVersion: myelin.io/v1alpha1
+apiVersion: myelin.myelin.io/v1alpha1
 kind: MyelinSecretPolicy
 metadata:
   name: db-creds-policy
