@@ -27,11 +27,8 @@ Myelin Operator
 
 ## Quick start
 
-> **Note:** No tagged release exists yet — `install.yaml` is generated on tag push via CI.
-> Until then, install from source using `kubectl apply -k config/default` after cloning.
-
 ```bash
-# 1. Install the operator (once a release is tagged)
+# 1. Install the operator
 kubectl apply -f https://github.com/akashbhujbalwebsite/myelin/releases/latest/download/install.yaml
 
 # 2. Save the operator public key locally
@@ -74,7 +71,7 @@ kubectl auth can-i list secrets \
 
 ## Encryption scheme
 
-Myelin uses **hybrid envelope encryption** — there is no plaintext size limit:
+Myelin uses **hybrid envelope encryption** — the encryption scheme does not impose an RSA plaintext-size limit; large values are encrypted with AES-256-GCM and only the AES key is RSA-wrapped:
 
 1. A fresh **AES-256** key is generated per encryption (`crypto/rand`).
 2. The secret value is encrypted with **AES-256-GCM** (authenticated encryption — tampering is detected).
@@ -96,7 +93,7 @@ Several tools address adjacent problems — Myelin's specific combination of pro
 | No approval workflow | ✅ | ✅ | ❌ | ❌ | ✅ |
 | Ciphertext safe to Git-commit | ✅ | ❌ | ❌ | ❌ | ✅ |
 
-**Myelin's precise differentiator:** the combination of Git-safe ciphertext + no Vault dependency + per-secret RBAC + continuous drift correction — none of the above tools provide all four together.
+**Myelin's proposed differentiation:** the combination of Git-safe ciphertext + no Vault dependency + per-secret RBAC + continuous drift correction. No tool in the table above provides all four together, but this is a fast-moving ecosystem — check each project's current roadmap.
 
 KubeVault provides per-secret RBAC via `SecretAccessRequest` but requires a running Vault cluster. Sealed Secrets handles Git-safe encryption but has no RBAC automation. ESO syncs from external stores but neither encrypts for Git nor manages RBAC. access-manager handles RBAC but has no encryption.
 
